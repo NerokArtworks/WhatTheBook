@@ -23,7 +23,7 @@ import com.book.shop.jwtSecurity.AutentificatorJWT;
 import com.book.shop.repositorios.UsuarioRepositorio;
 
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping("/usuarios")
 @CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 public class Usuariocontrolador {
 
@@ -96,11 +96,11 @@ public class Usuariocontrolador {
 		//Controlador para aÃ±adir un registro nuevo
 
 
-		@PostMapping(path="/anadirnuevo",consumes=MediaType.APPLICATION_JSON_VALUE)
+		@PostMapping(path="/register",consumes=MediaType.APPLICATION_JSON_VALUE)
 		public void autenticaUsuario(@RequestBody
 		DatosAltaUsuario u,HttpServletRequest request) {
 			usuRep.save(new Usuario(
-			u.id, u.username, u.password, u.dni, u.nombre,
+			u.id, u.username, u.password, u.email, u.dni, u.nombre,
 			u.apellidos, u.fecha_nac, u.pais, u.telefono,
 			u.socio, u.rol));
 		  }	
@@ -109,12 +109,12 @@ public class Usuariocontrolador {
 			int id;
 			String username;
 			String password;
+			String email;
 			String dni;
 			String nombre;
 			String apellidos;
 			Date fecha_nac;
 			String pais;
-			String email;
 			String telefono;
 			byte socio;
 			String rol;
@@ -129,9 +129,9 @@ public class Usuariocontrolador {
 			this.nombre = nombre;
 			this.apellidos = apellidos;
 			this.fecha_nac = fecha_nac;
-			this.pais = pais;
+			this.pais = (pais != null)? pais : null;
 			this.email = email;
-			this.telefono = telefono;
+			this.telefono = (telefono != null)? telefono : null;
 			this.socio = socio;
 			this.rol = rol;
 		}}
@@ -140,14 +140,14 @@ public class Usuariocontrolador {
 		  	
 	 // Controlador que autentica un usuario
 	
-		@PostMapping(path = "/autentica", consumes = MediaType.APPLICATION_JSON_VALUE)
+		@PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
 		public DTO autentitcaUsuario(@RequestBody DatosAutenticacionUsuario datos, HttpServletRequest request,
 				HttpServletResponse response) {
 	
 			DTO dto = new DTO();
 			dto.put("result", "fail");
 	
-			Usuario usuAutenticado = usuRep.findByUsernameAndPassword(datos.username, datos.password);
+			Usuario usuAutenticado = usuRep.findByEmailAndPassword(datos.email, datos.password);
 	
 			// si existe el usuario y los datos son correctos, devolveremos un success y
 			// todos los datos del usuario
@@ -169,12 +169,12 @@ public class Usuariocontrolador {
 		}
 		
 		static class DatosAutenticacionUsuario {
-			String username;
+			String email;
 			String password;
 	
-			public DatosAutenticacionUsuario(String username, String password) {
+			public DatosAutenticacionUsuario(String email, String password) {
 				super();
-				this.username = username;
+				this.email = email;
 				this.password = password;
 			}
 	

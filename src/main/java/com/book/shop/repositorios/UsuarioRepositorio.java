@@ -25,6 +25,7 @@ public interface UsuarioRepositorio extends JpaRepository<Usuario, Serializable>
 	public abstract Usuario findById(int id);
 	public abstract List<Usuario> findByNombre(String username);
 	public abstract Usuario findByUsernameAndPassword(String username, String password);
+	public abstract Usuario findByEmailAndPassword(String email, String password);
 	
 	@Transactional
 	public abstract void deleteById(int id);

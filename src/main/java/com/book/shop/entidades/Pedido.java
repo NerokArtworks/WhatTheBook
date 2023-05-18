@@ -17,6 +17,7 @@ public class Pedido implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue
 	private int id;
 
 	@Temporal(TemporalType.DATE)
@@ -25,7 +26,7 @@ public class Pedido implements Serializable {
 	private float importe;
 
 	//bi-directional many-to-one association to DetallesPedido
-	@OneToMany(mappedBy="pedido")
+	@OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DetallesPedido> detallesPedidos;
 
 	//bi-directional many-to-one association to Descuento
@@ -39,6 +40,15 @@ public class Pedido implements Serializable {
 	private Usuario usuario;
 
 	public Pedido() {
+	}
+	
+	public Pedido(int id, Date fecha, float importe, List<DetallesPedido> detallesPedidos, Descuento descuento, Usuario usuario) {
+		this.id = id;
+		this.fecha = fecha;
+		this.importe = importe;
+		this.detallesPedidos = detallesPedidos;
+		this.descuento = descuento;
+		this.usuario = usuario;
 	}
 
 	public int getId() {

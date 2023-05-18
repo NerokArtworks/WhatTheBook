@@ -15,6 +15,7 @@ public class DetallesPedido implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	private int cantidad;
@@ -32,6 +33,14 @@ public class DetallesPedido implements Serializable {
 	private Pedido pedido;
 
 	public DetallesPedido() {
+	}
+	
+	public DetallesPedido(int id, int cantidad, float importe, Libro libro, Pedido pedido) {
+		this.id = id;
+		this.cantidad = cantidad;
+		this.importe = importe;
+		this.libro = libro;
+		this.pedido = pedido;
 	}
 
 	public int getId() {

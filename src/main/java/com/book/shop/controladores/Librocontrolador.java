@@ -28,7 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.book.shop.entidades.Libro;
 import com.book.shop.jwtSecurity.AutentificatorJWT;
 import com.book.shop.entidades.Genero;
+import com.book.shop.controladores.Librocontrolador.DatosAltaLibro;
 import com.book.shop.entidades.Editoriale;
+import com.book.shop.repositorios.EditorialLibroRepositorio;
 import com.book.shop.repositorios.GeneroLibroRepositorio;
 import com.book.shop.repositorios.LibroRepositorio;
 import com.book.shop.repositorios.UsuarioRepositorio;
@@ -46,6 +48,8 @@ public class Librocontrolador {
 	GeneroLibroRepositorio generoRep;
 	@Autowired
 	GeneroLibroRepositorio libroGenero;
+	@Autowired
+	EditorialLibroRepositorio libroEditorial;
 
 	@GetMapping("/obtener")
 	public List<DTO> getLibros() {
@@ -58,7 +62,7 @@ public class Librocontrolador {
 			dtoLibros.put("saga", l.getSaga());
 			dtoLibros.put("autor", l.getAutor());
 			dtoLibros.put("ISBN", l.getIsbn());
-			dtoLibros.put("fecha_publicacion", l.getFechaPubli().toString());
+			dtoLibros.put("fecha_publi", l.getFechaPubli().toString());
 			dtoLibros.put("id_genero", l.getGenero().getId());
 			dtoLibros.put("genero", l.getGenero().getNombre());
 			dtoLibros.put("id_editorial", l.getEditoriale().getId());
@@ -91,7 +95,7 @@ public class Librocontrolador {
 				dtoLibros.put("saga", l.getSaga());
 				dtoLibros.put("autor", l.getAutor());
 				dtoLibros.put("ISBN", l.getIsbn());
-				dtoLibros.put("fecha_publicacion", l.getFechaPubli().toString());
+				dtoLibros.put("fecha_publi", l.getFechaPubli().toString());
 				dtoLibros.put("id_genero", l.getGenero().getId());
 				dtoLibros.put("genero", l.getGenero().getNombre());
 				dtoLibros.put("id_editorial", l.getEditoriale().getId());
@@ -137,7 +141,7 @@ public class Librocontrolador {
 					dtoLibros.put("saga", l.getSaga());
 					dtoLibros.put("autor", l.getAutor());
 					dtoLibros.put("ISBN", l.getIsbn());
-					dtoLibros.put("fecha_publicacion", l.getFechaPubli().toString());
+					dtoLibros.put("fecha_publi", l.getFechaPubli().toString());
 					dtoLibros.put("id_genero", l.getGenero().getId());
 					dtoLibros.put("genero", l.getGenero().getNombre());
 					dtoLibros.put("id_editorial", l.getEditoriale().getId());
@@ -185,7 +189,7 @@ public class Librocontrolador {
 					dtoLibros.put("saga", l.getSaga());
 					dtoLibros.put("autor", l.getAutor());
 					dtoLibros.put("ISBN", l.getIsbn());
-					dtoLibros.put("fecha_publicacion", l.getFechaPubli().toString());
+					dtoLibros.put("fecha_publi", l.getFechaPubli().toString());
 					dtoLibros.put("id_genero", l.getGenero().getId());
 					dtoLibros.put("genero", l.getGenero().getNombre());
 					dtoLibros.put("id_editorial", l.getEditoriale().getId());
@@ -202,29 +206,70 @@ public class Librocontrolador {
 			return dtoLibros;}	
 	//fin Obtener un registron con findById
 	
-	// PUT
-		@PutMapping(path="/modificar2",consumes=MediaType.APPLICATION_JSON_VALUE)
-		public DTO modificarLibro(@RequestBody DTO libro) {
-			Libro libroPasado = libroRep.findById(Integer.parseInt(libro.get("id").toString()));
-			Libro libroActualizado = new Libro(
-					libroPasado.getId(),
-					libroPasado.getTitulo(),
-					libroPasado.getSaga(),
-					libroPasado.getAutor(), 
-					libroPasado.getIsbn(),
-					libroPasado.getFechaPubli(),
-					libroPasado.getGenero(),
-					libroPasado.getEditoriale(),
-					libroPasado.getDescripcion(),
-					libroPasado.getSinopsis(),
-					libroPasado.getPrecio(),
-					libroPasado.getTipo().toString(),
-					libroPasado.getPortada(),
-					libroPasado.getRating(),
-					libroPasado.getStock());
-			Libro update = libroRep.save(libroActualizado);
-			return libro;
-		}
+		// PUT
+				@PutMapping(path="/modificar",consumes=MediaType.APPLICATION_JSON_VALUE)
+				public void modificarLibro(@RequestBody DatosAltaLibro l, HttpServletRequest request) {
+				    Optional<Libro> optionalLibro = Optional.ofNullable(libroRep.findById(l.id));
+				    Libro libro;
+				    if (optionalLibro.isPresent()) {
+				        libro = optionalLibro.get();
+				    } else {
+				        libro = new Libro();
+				        libro.setId(l.id);
+				    }
+				    libro.setTitulo(l.titulo);
+				    libro.setAutor(l.autor);
+				    libro.setSaga(l.saga);
+				    libro.setIsbn(l.isbn);
+				    libro.setTipo(l.tipo);
+				    libro.setPrecio(l.precio);
+				    libro.setDescripcion(l.descripcion);
+				    libro.setSinopsis(l.sinopsis);
+				    libro.setRating(l.rating);
+				    libro.setStock(l.stock);
+				    libro.setEditoriale(libroEditorial.findById(l.id_editorial));
+				    libro.setFechaPubli(l.fecha_publi);
+				    libro.setGenero(libroGenero.findById(l.id_genero));
+				    libroRep.save(libro);
+				}
+				
+				static class DatosAltaLibro{
+					int id;
+					String titulo;
+					String autor;
+					String saga;
+					String isbn;
+					String tipo;
+					String sinopsis;
+					String descripcion;
+					float precio;
+					float rating;
+					int id_editorial;
+					Date fecha_publi;
+					int id_genero;
+					int stock;
+					
+					public DatosAltaLibro(int id, String titulo,String autor,
+							int id_editorial, Date fecha_publi, int id_genero, 
+							float precio, float rating, int stock, String ISBN,
+							String saga, String tipo, String sinopsis, String descripcion) {
+						super();
+						this.id = id;
+						this.titulo = titulo;
+						this.autor = autor;
+						this.id_editorial=id_editorial;
+						this.fecha_publi=fecha_publi;
+						this.id_genero=id_genero;
+						this.precio = precio;
+						this.rating = rating;
+						this.stock = stock;
+						this.isbn = ISBN;
+						this.saga = saga;
+						this.tipo = tipo;
+						this.sinopsis = sinopsis;
+						this.descripcion = descripcion;
+					}
+				}
 	
 	//Borra un registro de la base de datos
 

@@ -24,7 +24,7 @@ import com.book.shop.repositorios.UsuarioRepositorio;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*")
 public class Usuariocontrolador {
 
 	@Autowired
@@ -40,9 +40,21 @@ public class Usuariocontrolador {
 
 		for (Usuario u : usuarios) {
 			DTO dtoUsuario = new DTO();
-
+			dtoUsuario.put("id",  u.getId());
 			dtoUsuario.put("nombre", u.getNombre());
+			dtoUsuario.put("apellidos", u.getApellidos());
+			dtoUsuario.put("dni", u.getDni());
+			dtoUsuario.put("email", u.getEmail());
 			dtoUsuario.put("fecha_nac", u.getFechaNac().toString());
+			dtoUsuario.put("fecha_creacion", u.getFecha_creacion().toString());
+			dtoUsuario.put("pais", u.getPais());
+			dtoUsuario.put("ciudad", u.getCiudad());
+			dtoUsuario.put("direccion", u.getDireccion());
+			dtoUsuario.put("password", u.getPassword());
+			dtoUsuario.put("rol", u.getRol());
+			dtoUsuario.put("socio", u.getSocio());
+			dtoUsuario.put("telefono", u.getTelefono());
+			dtoUsuario.put("username", u.getUsername());
 			listaUsuariosDto.add(dtoUsuario);
 		}
 
@@ -62,10 +74,21 @@ public class Usuariocontrolador {
 						
 				DTO dtoUsuario=new DTO();
 				if(u!=null) {
-				dtoUsuario.put("nombre",u.getNombre());
-				dtoUsuario.put("fecha_nac",u.getFechaNac().toString());
-				dtoUsuario.put("nombre", u.getNombre());
-				
+					dtoUsuario.put("id",  u.getId());
+					dtoUsuario.put("nombre", u.getNombre());
+					dtoUsuario.put("apellidos", u.getApellidos());
+					dtoUsuario.put("dni", u.getDni());
+					dtoUsuario.put("email", u.getEmail());
+					dtoUsuario.put("fecha_nac", u.getFechaNac().toString());
+					dtoUsuario.put("fecha_creacion", u.getFecha_creacion().toString());
+					dtoUsuario.put("pais", u.getPais());
+					dtoUsuario.put("ciudad", u.getCiudad());
+					dtoUsuario.put("direccion", u.getDireccion());
+					dtoUsuario.put("password", u.getPassword());
+					dtoUsuario.put("rol", u.getRol());
+					dtoUsuario.put("socio", u.getSocio());
+					dtoUsuario.put("telefono", u.getTelefono());
+					dtoUsuario.put("username", u.getUsername());
 				}else dtoUsuario.put("result","fail");
 		
 			return dtoUsuario;}	
@@ -101,7 +124,7 @@ public class Usuariocontrolador {
 		DatosAltaUsuario u,HttpServletRequest request) {
 			usuRep.save(new Usuario(
 			u.id, u.username, u.password, u.email, u.dni, u.nombre,
-			u.apellidos, u.fecha_nac, u.pais, u.telefono,
+			u.apellidos, u.fecha_nac, u.fecha_creacion, u.pais, u.ciudad, u.direccion, u.telefono,
 			u.socio, u.rol));
 		  }	
 
@@ -114,13 +137,16 @@ public class Usuariocontrolador {
 			String nombre;
 			String apellidos;
 			Date fecha_nac;
+			Date fecha_creacion;
 			String pais;
+			String ciudad;
+			String direccion;
 			String telefono;
 			byte socio;
 			String rol;
 			
 		public DatosAltaUsuario(int id, String username, String password, String dni, String nombre, String apellidos, Date fecha_nac,
-				String pais, String email, String telefono, byte socio, String rol) {
+				Date fecha_creacion, String pais, String ciudad, String direccion, String email, String telefono, byte socio, String rol) {
 			super();
 			this.id = id;
 			this.username = username;
@@ -129,7 +155,10 @@ public class Usuariocontrolador {
 			this.nombre = nombre;
 			this.apellidos = apellidos;
 			this.fecha_nac = fecha_nac;
+			this.fecha_creacion = fecha_creacion;
 			this.pais = (pais != null)? pais : null;
+			this.ciudad = (ciudad != null)? ciudad : null;
+			this.direccion = (direccion != null)? direccion : null;
 			this.email = email;
 			this.telefono = (telefono != null)? telefono : null;
 			this.socio = socio;
@@ -157,6 +186,7 @@ public class Usuariocontrolador {
 				// devolvemos jwt que usaremos de ahora en adelante en las cabeceras para
 				// identificar al usuario
 				dto.put("jwt", AutentificatorJWT.codificaJWT(usuAutenticado));
+				dto.put("user_id", usuAutenticado.getId());
 	
 				// Prueba cookie. Quita el request y el response
 				Cookie cook = new Cookie("jwt", AutentificatorJWT.codificaJWT(usuAutenticado));
@@ -184,17 +214,18 @@ public class Usuariocontrolador {
 		
 		//Controlador devuevle el usuario autenticado
 	
-		@GetMapping("/quieneres")
-		public DTO getAutenticado(HttpServletRequest request) {
+		@PostMapping("/getUser")
+		public DTO getAutenticado(@RequestBody DTO token, HttpServletRequest request) {
 			DTO dtoUsuario = new DTO();
-			Cookie[] c = request.getCookies();
+			
 			dtoUsuario.put("result", "fail");
 			int idUsuarioAutenticado = -1;
-			for (Cookie co : c) {
-			if (co.getName().equals("jwt"))
-					// dtoUsuario.put("id",
-	       idUsuarioAutenticado = AutentificatorJWT.getIdUsuarioDesdeJWT(co.getValue());
+			
+			if ((String) token.get("token") != null) {
+				// dtoUsuario.put("id",
+				idUsuarioAutenticado = AutentificatorJWT.getIdUsuarioDesdeJWT((String) token.get("token"));
 			}
+				
 			// identificamos usuario por jwt de cabecera recibida
 	
 			// int idUsuarioAutenticado =
@@ -205,10 +236,21 @@ public class Usuariocontrolador {
 			// si existe el usuario y los datos son correctos, devolveremos un success y
 			// todos los datos del usuario
 			if (u != null) {
-				dtoUsuario.put("result", "ok");
+				dtoUsuario.put("id",  u.getId());
 				dtoUsuario.put("nombre", u.getNombre());
+				dtoUsuario.put("apellidos", u.getApellidos());
+				dtoUsuario.put("dni", u.getDni());
+				dtoUsuario.put("email", u.getEmail());
 				dtoUsuario.put("fecha_nac", u.getFechaNac().toString());
+				dtoUsuario.put("fecha_creacion", u.getFecha_creacion().toString());
+				dtoUsuario.put("pais", u.getPais());
+				dtoUsuario.put("ciudad", u.getCiudad());
+				dtoUsuario.put("direccion", u.getDireccion());
+				dtoUsuario.put("password", u.getPassword());
 				dtoUsuario.put("rol", u.getRol());
+				dtoUsuario.put("socio", u.getSocio());
+				dtoUsuario.put("telefono", u.getTelefono());
+				dtoUsuario.put("username", u.getUsername());
 			}
 	
 			return dtoUsuario;

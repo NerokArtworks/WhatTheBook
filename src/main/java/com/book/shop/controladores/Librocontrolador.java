@@ -37,7 +37,7 @@ import com.book.shop.repositorios.UsuarioRepositorio;
 
 @RestController
 @RequestMapping("/libros")
-@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*")
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*")
 public class Librocontrolador {
 
 	@Autowired
@@ -228,6 +228,7 @@ public class Librocontrolador {
 				    libro.setRating(l.rating);
 				    libro.setStock(l.stock);
 				    libro.setEditoriale(libroEditorial.findById(l.id_editorial));
+				    libro.setPortada(l.portada);
 				    libro.setFechaPubli(l.fecha_publi);
 				    libro.setGenero(libroGenero.findById(l.id_genero));
 				    libroRep.save(libro);
@@ -242,6 +243,7 @@ public class Librocontrolador {
 					String tipo;
 					String sinopsis;
 					String descripcion;
+					String portada;
 					float precio;
 					float rating;
 					int id_editorial;
@@ -251,7 +253,7 @@ public class Librocontrolador {
 					
 					public DatosAltaLibro(int id, String titulo,String autor,
 							int id_editorial, Date fecha_publi, int id_genero, 
-							float precio, float rating, int stock, String ISBN,
+							float precio, float rating, String portada, int stock, String ISBN,
 							String saga, String tipo, String sinopsis, String descripcion) {
 						super();
 						this.id = id;
@@ -265,6 +267,7 @@ public class Librocontrolador {
 						this.stock = stock;
 						this.isbn = ISBN;
 						this.saga = saga;
+						this.portada = portada;
 						this.tipo = tipo;
 						this.sinopsis = sinopsis;
 						this.descripcion = descripcion;
@@ -314,46 +317,26 @@ public class Librocontrolador {
 		//Controlador para aÃ±adir un registro nuevo
 
 
-		/*@PostMapping(path="/nuevo",consumes=MediaType.APPLICATION_JSON_VALUE)
+		@PostMapping(path="/nuevo",consumes=MediaType.APPLICATION_JSON_VALUE)
 		public void nuevoLibro(@RequestBody
 				DatosAltaLibro l,HttpServletRequest request) {
 			Libro libro = new Libro();
 			libro.setTitulo(l.titulo);
-			libro.setSaga(l.saga);
-			libro.setAutor(l.autor);
-			libro.setEditoriale(l.editorial);
-			libro.setFechaPublicacion(l.fecha_publicacion);
-			libro.setLibroGenero(libroGenero.findById(l.libroGenero));
-			if (l.fechaElim == null) {
-				libro.setFechaElim(null);
-			} else {
-				libro.setFechaElim(l.fechaElim);
-			}
+		    libro.setAutor(l.autor);
+		    libro.setSaga(l.saga);
+		    libro.setIsbn(l.isbn);
+		    libro.setTipo(l.tipo);
+		    libro.setPrecio(l.precio);
+		    libro.setDescripcion(l.descripcion);
+		    libro.setSinopsis(l.sinopsis);
+		    libro.setRating(l.rating);
+		    libro.setPortada(l.portada);
+		    libro.setStock(l.stock);
+		    libro.setEditoriale(libroEditorial.findById(l.id_editorial));
+		    libro.setFechaPubli(l.fecha_publi);
+		    libro.setGenero(libroGenero.findById(l.id_genero));
 			libroRep.save(libro);
 		}
-		
-		static class DatosAltaLibro{
-			int id;
-			String titulo;
-			String autor;
-			String editorial;
-			Date fecha_publicacion;
-			int libroGenero;
-			Date fechaElim;
-			
-			public DatosAltaLibro(int id, String titulo,String autor,
-					String editorial,Date fecha_publicacion,
-					int libroGenero,Date fechaElim) {
-				super();
-				this.id = id;
-				this.titulo = titulo;
-				this.autor = autor;
-				this.editorial=editorial;
-				this.fecha_publicacion=fecha_publicacion;
-				this.libroGenero=libroGenero;
-				this.fechaElim=fechaElim;
-			}
-		}*/
 
 	//fin controlador aÃ±adir registro
 	

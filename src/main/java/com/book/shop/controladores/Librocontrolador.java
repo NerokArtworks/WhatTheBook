@@ -37,7 +37,7 @@ import com.book.shop.repositorios.UsuarioRepositorio;
 
 @RestController
 @RequestMapping("/libros")
-@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE}, allowedHeaders = "*")
 public class Librocontrolador {
 
 	@Autowired

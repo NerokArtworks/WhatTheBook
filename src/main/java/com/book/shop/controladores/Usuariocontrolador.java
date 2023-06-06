@@ -3,6 +3,7 @@ package com.book.shop.controladores;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -13,11 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.book.shop.controladores.Usuariocontrolador.DatosAltaUsuario;
+import com.book.shop.controladores.Usuariocontrolador.DatosAutenticacionUsuario;
 import com.book.shop.entidades.Usuario;
 import com.book.shop.jwtSecurity.AutentificatorJWT;
 import com.book.shop.repositorios.UsuarioRepositorio;
@@ -53,6 +57,7 @@ public class Usuariocontrolador {
 			dtoUsuario.put("password", u.getPassword());
 			dtoUsuario.put("rol", u.getRol());
 			dtoUsuario.put("socio", u.getSocio());
+			dtoUsuario.put("saldo", u.getSaldo());
 			dtoUsuario.put("telefono", u.getTelefono());
 			dtoUsuario.put("username", u.getUsername());
 			listaUsuariosDto.add(dtoUsuario);
@@ -86,6 +91,7 @@ public class Usuariocontrolador {
 					dtoUsuario.put("direccion", u.getDireccion());
 					dtoUsuario.put("password", u.getPassword());
 					dtoUsuario.put("rol", u.getRol());
+					dtoUsuario.put("saldo", u.getSaldo());
 					dtoUsuario.put("socio", u.getSocio());
 					dtoUsuario.put("telefono", u.getTelefono());
 					dtoUsuario.put("username", u.getUsername());
@@ -125,7 +131,7 @@ public class Usuariocontrolador {
 			usuRep.save(new Usuario(
 			u.id, u.username, u.password, u.email, u.dni, u.nombre,
 			u.apellidos, u.fecha_nac, u.fecha_creacion, u.pais, u.ciudad, u.direccion, u.telefono,
-			u.socio, u.rol));
+			u.saldo, u.socio, u.rol));
 		  }	
 
 		  	static class DatosAltaUsuario{
@@ -142,11 +148,12 @@ public class Usuariocontrolador {
 			String ciudad;
 			String direccion;
 			String telefono;
+			float saldo;
 			byte socio;
 			String rol;
 			
 		public DatosAltaUsuario(int id, String username, String password, String dni, String nombre, String apellidos, Date fecha_nac,
-				Date fecha_creacion, String pais, String ciudad, String direccion, String email, String telefono, byte socio, String rol) {
+				Date fecha_creacion, String pais, String ciudad, String direccion, String email, String telefono, float saldo, byte socio, String rol) {
 			super();
 			this.id = id;
 			this.username = username;
@@ -160,6 +167,7 @@ public class Usuariocontrolador {
 			this.ciudad = (ciudad != null)? ciudad : null;
 			this.direccion = (direccion != null)? direccion : null;
 			this.email = email;
+			this.saldo = saldo;
 			this.telefono = (telefono != null)? telefono : null;
 			this.socio = socio;
 			this.rol = rol;
@@ -249,6 +257,7 @@ public class Usuariocontrolador {
 				dtoUsuario.put("password", u.getPassword());
 				dtoUsuario.put("rol", u.getRol());
 				dtoUsuario.put("socio", u.getSocio());
+				dtoUsuario.put("saldo", u.getSaldo());
 				dtoUsuario.put("telefono", u.getTelefono());
 				dtoUsuario.put("username", u.getUsername());
 			}
@@ -259,4 +268,27 @@ public class Usuariocontrolador {
 		//fin quiereres
 
 
+		@PutMapping(path="/modificar",consumes=MediaType.APPLICATION_JSON_VALUE)
+		public void modificarUsuario(@RequestBody DatosAltaUsuario u, HttpServletRequest request) {
+		    Optional<Usuario> optionalUsuario = Optional.ofNullable(usuRep.findById(u.id));
+		    Usuario usuario;
+		    if (optionalUsuario.isPresent()) {
+		    	usuario = optionalUsuario.get();
+		    } else {
+		    	usuario = new Usuario();
+		    	usuario.setId(u.id);
+		    }
+		    usuario.setUsername(u.username);
+		    usuario.setNombre(u.nombre);
+		    usuario.setApellidos(u.apellidos);
+		    usuario.setDni(u.dni);
+		    usuario.setFechaNac(u.fecha_nac);
+		    usuario.setPais(u.pais);
+		    usuario.setCiudad(u.ciudad);
+		    usuario.setDireccion(u.direccion);
+		    usuario.setSaldo(u.saldo);
+		    usuario.setEmail(u.email);
+		    usuario.setSocio(u.socio);
+		    usuRep.save(usuario);
+		}
 }

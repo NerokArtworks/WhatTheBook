@@ -1,17 +1,11 @@
 package com.book.shop.controladores;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,10 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.book.shop.entidades.Libro;
-import com.book.shop.jwtSecurity.AutentificatorJWT;
 import com.book.shop.entidades.Genero;
-import com.book.shop.controladores.Librocontrolador.DatosAltaLibro;
-import com.book.shop.entidades.Editoriale;
 import com.book.shop.repositorios.EditorialLibroRepositorio;
 import com.book.shop.repositorios.GeneroLibroRepositorio;
 import com.book.shop.repositorios.LibroRepositorio;
@@ -178,7 +169,6 @@ public class Librocontrolador {
 			//Creo una lista de hashmap para devolver un json
 			
 			//leo de repositorio todos los registros
-			System.out.println("\n**ID DEL LIBRO PETICIÓN OBTENER1: " + solouno.get("id").toString());
 			Libro l = libroRep.findById(Integer.parseInt(solouno.get("id").toString()));
 			//Los voy cargar en el DTO
 					

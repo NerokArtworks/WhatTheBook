@@ -3,6 +3,7 @@ package com.book.shop.controladores;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.book.shop.entidades.Pedido;
+import com.book.shop.controladores.Pedidocontrolador.DatosAltaPedido;
 import com.book.shop.entidades.Descuento;
 import com.book.shop.entidades.DetallesPedido;
 import com.book.shop.entidades.Usuario;
@@ -74,38 +76,58 @@ public class Pedidocontrolador {
 		return listaPedidosDto;
 	}
 	
-	@PostMapping(path="/getByUser",consumes=MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path="/getByUser", consumes=MediaType.APPLICATION_JSON_VALUE)
 	public List<DTO> getByUser(@RequestBody DTO usuario) {
-		
-		Usuario user = usuRep.findById((int) usuario.get("id"));
-		
-		List<Pedido> pedidos = pedidoRep.findByUsuario(user);
-		//Los voy cargar en el DTO
-		List<DTO> listaPedidosDto = new ArrayList<DTO>();
-		if(pedidos!=null && user != null) {
-			for (Pedido p : pedidos) {
-				DTO dtoPedidos = new DTO();
-				dtoPedidos.put("id", p.getId());
-				dtoPedidos.put("fecha", p.getFecha().toString());
-				dtoPedidos.put("importe", p.getImporte());
-				dtoPedidos.put("detallesPedidos", p.getDetallesPedidos());
-				dtoPedidos.put("descuento", p.getDescuento().getId());
-				dtoPedidos.put("usuario", p.getUsuario().getId());
-				listaPedidosDto.add(dtoPedidos);
-			}
-			if (listaPedidosDto.isEmpty()) {
-				DTO dtoPedidos = new DTO();
-				dtoPedidos.put("result","not found");
-				listaPedidosDto.add(dtoPedidos);
-			}
-		} else {
-			DTO dtoPedidos = new DTO();
-			dtoPedidos.put("result","fail");
-			listaPedidosDto.add(dtoPedidos);
-		}
-		
-		return listaPedidosDto;
+		Integer userId = (Integer) usuario.get("id");
+	    Optional<Usuario> userOptional = usuRep.findById(userId);
+
+	    List<DTO> listaPedidosDto = new ArrayList<>();
+
+	    if (userId == null || !userOptional.isPresent()) {
+	        DTO dtoPedidos = new DTO();
+	        dtoPedidos.put("result", "fail");
+	        listaPedidosDto.add(dtoPedidos);
+	    } else {
+	        List<Pedido> pedidos = pedidoRep.findByUsuario(userOptional);
+	        for (Pedido p : pedidos) {
+	            DTO dtoPedidos = new DTO();
+	            dtoPedidos.put("id", p.getId());
+	            dtoPedidos.put("fecha", p.getFecha().toString());
+	            dtoPedidos.put("importe", p.getImporte());
+
+	            List<DetallesPedidoDTO> detallesPedidosDTO = new ArrayList<>();
+	            for (DetallesPedido detalle : p.getDetallesPedidos()) {
+	                DetallesPedidoDTO detalleDTO = new DetallesPedidoDTO();
+	                detalleDTO.setId(detalle.getId());
+	                detalleDTO.setCantidad(detalle.getCantidad());
+	                detalleDTO.setImporte(detalle.getImporte());
+	                detalleDTO.setLibro(detalle.getLibro().getId());
+	                detalleDTO.setPedido(detalle.getPedido().getId());
+	                // Asignar otras propiedades necesarias
+	                detallesPedidosDTO.add(detalleDTO);
+	            }
+
+	            dtoPedidos.put("detallesPedidos", detallesPedidosDTO);
+
+	            if (p.getDescuento() != null) {
+	                dtoPedidos.put("descuento", p.getDescuento().getId());
+	            } else {
+	                dtoPedidos.put("descuento", null);
+	            }
+
+	            dtoPedidos.put("usuario", p.getUsuario().getId());
+	            listaPedidosDto.add(dtoPedidos);
+	        }
+	        if (listaPedidosDto.isEmpty()) {
+	            DTO dtoPedidos = new DTO();
+	            dtoPedidos.put("result","not found");
+	            listaPedidosDto.add(dtoPedidos);
+	        }
+	    }
+
+	    return listaPedidosDto;
 	}
+
 	
 	
 	

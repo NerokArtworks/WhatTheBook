@@ -18,7 +18,7 @@ public class Descuento implements Serializable {
 	@Id
 	private int id;
 
-	@Column(name="`%`")
+	@Column(name="porcentaje")
 	private int porcentaje;
 
 	@Column(name="importe_minimo")
@@ -31,6 +31,10 @@ public class Descuento implements Serializable {
 	private List<Pedido> pedidos;
 
 	public Descuento() {
+	}
+	
+	public Descuento(int id) {
+		this.id = id;
 	}
 
 	public int getId() {
@@ -45,7 +49,7 @@ public class Descuento implements Serializable {
 		return this.porcentaje;
 	}
 
-	public void set_(int porcentaje) {
+	public void setPorcentaje(int porcentaje) {
 		this.porcentaje = porcentaje;
 	}
 

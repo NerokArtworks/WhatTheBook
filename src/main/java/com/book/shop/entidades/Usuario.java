@@ -45,6 +45,8 @@ public class Usuario implements Serializable {
 	private String rol;
 
 	private byte socio;
+	
+	private float saldo;
 
 	private String telefono;
 
@@ -54,7 +56,7 @@ public class Usuario implements Serializable {
 	}
 
 	public Usuario(int id, String username, String password, String email, String dni, String nombre, String apellidos,
-			Date fecha_nac, Date fecha_creacion, String pais, String ciudad, String direccion, String telefono, byte socio, String rol) {
+			Date fecha_nac, Date fecha_creacion, String pais, String ciudad, String direccion, String telefono, float saldo, byte socio, String rol) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -69,6 +71,7 @@ public class Usuario implements Serializable {
 		this.ciudad = ciudad;
 		this.direccion = direccion;
 		this.telefono = telefono;
+		this.setSaldo(saldo);
 		this.socio = socio;
 		this.rol = rol;
 	}
@@ -209,6 +212,20 @@ public class Usuario implements Serializable {
 	 */
 	public void setFecha_creacion(Date fecha_creacion) {
 		this.fecha_creacion = fecha_creacion;
+	}
+
+	/**
+	 * @return the saldo
+	 */
+	public float getSaldo() {
+		return saldo;
+	}
+
+	/**
+	 * @param saldo the saldo to set
+	 */
+	public void setSaldo(float saldo) {
+		this.saldo = saldo;
 	}
 
 }

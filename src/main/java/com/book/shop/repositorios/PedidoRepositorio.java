@@ -3,6 +3,7 @@ package com.book.shop.repositorios;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -33,6 +34,7 @@ public interface PedidoRepositorio extends JpaRepository<Pedido, Serializable>{
 
 	@Transactional
 	public abstract Pedido save(Pedido p);
+	public abstract List<Pedido> findByUsuario(Optional<Usuario> userOptional);
 	
 	
 
